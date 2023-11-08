@@ -14,6 +14,11 @@ def runsketch(arg):
     vectoros.launch_task('sketch')
     return EXIT
 
+def life(arg):
+    vos_state.show_menu=False     # get the menu of the way
+    vectoros.launch_task('life')
+    return EXIT
+
 def planets(arg):
     vos_state.show_menu=False     # get the menu of the way
     vectoros.launch_task('planets')  # launch
@@ -77,7 +82,7 @@ async def vos_main():
         with Menu(clear_after=True,fg_color=colors.PHOSPHOR_DARK,bg_color=colors.PHOSPHOR_BG,
                   cursor_bg=colors.PHOSPHOR_BG, cursor_fg=colors.PHOSPHOR_BRIGHT) as amenu:  
             ## name in menu, command to run, return value?
-            submenu=[["  Planets", planets, 0],["  Sketch",runsketch,0],["  Back",m_exit,None]]
+            submenu=[["  Planets", planets, 0],["  Sketch",runsketch,0],["  Life",life,0],["  Back",m_exit,None]]
             mainmenu=[[" Lissajous", run_lissajous,None],
                       [" Demos", SUBMENU, submenu] ,
                       [" Sound", toggle_sound, None],

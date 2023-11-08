@@ -1,7 +1,7 @@
 # list of things to launch from vectoros
 
 # dictionary of tags to imports (will look for .vos_main() or .main() here) 
-launch_list={ "menu": "supercon_menu", 'sketch': 'sketch', "demo": "examples", "planets":"planets", "lissajous":"lissajous"}
+launch_list={ "menu": "supercon_menu", 'sketch': 'sketch', "demo": "examples", "planets":"planets", "lissajous":"lissajous", "life":"life"}
 
 # list what you want to start auto (maybe just one thing?) need tag
 auto_launch_list=["menu"]
@@ -18,7 +18,7 @@ key_scan_rate = 100    # how often to scan the keyboard globally (ms; 0 to do it
 gc_thread_rate = 5000
 
 # Base rate for the timer (ms)
-timer_base_rate=100
+timer_base_rate=25 #the default is 100
 
 # Debug level (messages must be < this level to print)
 # That is, at level 0 only level 0 messages print
