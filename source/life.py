@@ -197,6 +197,12 @@ def joycb(key):
     if (key==keyleds.KEY_D):
         cycle_flag = False
         presets('d')
+    if (key==keyleds.KEY_LEVEL):
+        timer_rate = 1
+        update_timer()
+    if (key==keyleds.KEY_RANGE):
+        timer_rate = 200
+        update_timer()
 
 
 
@@ -213,7 +219,20 @@ async def vos_main():
     global exit_flag, board, tid, timer_rate
     init_board()
     # we treat the joystick like any other key here
-    keys=keyboardcb.KeyboardCB({keyleds.KEY_MENU: menu, keyleds.JOY_UP: joycb, keyleds.JOY_DN: joycb, keyleds.JOY_RT: joycb, keyleds.JOY_LF: joycb, keyleds.KEY_A: joycb, keyleds.KEY_B: joycb, keyleds.KEY_C: joycb, keyleds.KEY_D: joycb})
+    keys_in_use = {
+        keyleds.KEY_MENU: menu,
+        keyleds.JOY_UP: joycb,
+        keyleds.JOY_DN: joycb,
+        keyleds.JOY_RT: joycb,
+        keyleds.JOY_LF: joycb,
+        keyleds.KEY_A: joycb,
+        keyleds.KEY_B: joycb,
+        keyleds.KEY_C: joycb,
+        keyleds.KEY_D: joycb,
+        keyleds.KEY_LEVEL: joycb,
+        keyleds.KEY_RANGE: joycb,
+        }
+    keys=keyboardcb.KeyboardCB(keys_in_use)
     tid=timer.Timer.add_timer(timer_rate,next)
     # prime it
     next()
