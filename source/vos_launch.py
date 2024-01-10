@@ -18,7 +18,7 @@ key_scan_rate = 100    # how often to scan the keyboard globally (ms; 0 to do it
 gc_thread_rate = 5000
 
 # Base rate for the timer (ms)
-timer_base_rate=25 #the default is 100
+timer_base_rate=10 #the default is 100
 
 # Debug level (messages must be < this level to print)
 # That is, at level 0 only level 0 messages print

@@ -26,8 +26,8 @@ exit_flag=False    # don't exit
 tid=None           # timer ID
 timer_rate=5       # timer rate (ticks; see vos_launch.py for multiplier)
 cell_size = 10     # cell size in number of pixels
-rows = screen_size_y // cell_size
-cols = screen_size_x // cell_size
+rows = screen_size_y // cell_size #number of rows in the board (rounded down from the screen size)
+cols = screen_size_x // cell_size #number of columns in the board (rounded down from the screen size)
 cycle_flag = True
 
 def presets(x):
@@ -98,28 +98,35 @@ def init_board():
         board.append(row)
         oldboard.append(row)
 
+
 def printBoard():
+    #prints out the board
 
     global board
+    global oldboard
 
 
     y=0
 
-    #print the board
-    for row in board:
+    for i in range(rows):
 
         x=0
 
-        for cell in row:
+        for j in range(cols):
+
+            cell = board[i][j]
+            old_cell = oldboard[i][j]
+
             if cell == 1:
-                screen.tft.fill_rect(x,y,cell_size,cell_size,colors.rgb(random.randint(50,255), random.randint(50,255), random.randint(50,255)))
-            else:
+                if old_cell != 1:
+                    screen.tft.fill_rect(x,y,cell_size,cell_size,colors.rgb(random.randint(50,255), random.randint(50,255), random.randint(50,255)))
+            elif cell == 0 and old_cell == 1:
                 screen.tft.fill_rect(x,y,cell_size,cell_size,colors.BLACK)
 
             x+=cell_size
 
         y+=cell_size
-
+        
 
 #update the board
 def board_update():
@@ -251,7 +258,7 @@ async def vos_main():
     # do nothing... everything is on keyboard and timer
     while exit_flag==False:
         await asyncio.sleep_ms(500)
-# stop listening for keys
+    # stop listening for keys
     keys.detach()
     timer.Timer.remove_timer(tid)
     exit_flag=False  # next time
