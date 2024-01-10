@@ -98,6 +98,9 @@ def init_board():
         board.append(row)
         oldboard.append(row)
 
+        #black out the screen
+        screen.tft.fill_rect(0,0,screen_size_x,screen_size_y,colors.BLACK)
+
 
 def printBoard():
     #prints out the board
