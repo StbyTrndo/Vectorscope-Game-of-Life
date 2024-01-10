@@ -19,11 +19,15 @@ oldboard = []
 
 random.seed()
 
+screen_size_x = 240
+screen_size_y = 240
+
 exit_flag=False    # don't exit
 tid=None           # timer ID
-timer_rate=5      # timer rate (ticks; see vos_launch.py for multiplier)
-rows = 7
-cols = 15
+timer_rate=5       # timer rate (ticks; see vos_launch.py for multiplier)
+cell_size = 10     # cell size in number of pixels
+rows = screen_size_y // cell_size
+cols = screen_size_x // cell_size
 cycle_flag = True
 
 def presets(x):
@@ -94,6 +98,29 @@ def init_board():
         board.append(row)
         oldboard.append(row)
 
+def printBoard():
+
+    global board
+
+
+    y=0
+
+    #print the board
+    for row in board:
+
+        x=0
+
+        for cell in row:
+            if cell == 1:
+                screen.tft.fill_rect(x,y,cell_size,cell_size,colors.rgb(random.randint(50,255), random.randint(50,255), random.randint(50,255)))
+            else:
+                screen.tft.fill_rect(x,y,cell_size,cell_size,colors.BLACK)
+
+            x+=cell_size
+
+        y+=cell_size
+
+
 #update the board
 def board_update():
     global board, oldboard
@@ -139,24 +166,9 @@ def board_update():
 
 # print screen and increment the game
 def next():
-    global board
 
-    x=0
-    y=0
-
-    #print the board
-    for row in board:
-        display_row=""
-        for cell in row:
-            if cell == 1:
-                display_row = display_row+"X"
-            elif cell == 0:
-                display_row = display_row+" "
-            else:
-                display_row = display_row+str(cell)
-        
-        screen.text(x,y,display_row,colors.rgb(random.randint(50,255), random.randint(50,255), random.randint(50,255)) ,colors.BLACK)
-        y+=30
+    #printBoardXs()
+    printBoard()
 
     board_update()
 
