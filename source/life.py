@@ -29,6 +29,7 @@ cell_size = 10     # cell size in number of pixels
 rows = screen_size_y // cell_size #number of rows in the board (rounded down from the screen size)
 cols = screen_size_x // cell_size #number of columns in the board (rounded down from the screen size)
 cycle_flag = True
+color_mode = 0
 
 def presets(x):
 
@@ -107,7 +108,11 @@ def printBoard():
 
     global board
     global oldboard
+    global color_mode
 
+    color = colors.MAGENTA #if you see this color, something's gone wrong
+
+    if color_mode == 1: color = colors.rgb(random.randint(50,255), random.randint(50,255), random.randint(50,255))
 
     y=0
 
@@ -122,7 +127,11 @@ def printBoard():
 
             if cell == 1:
                 if old_cell != 1:
-                    screen.tft.fill_rect(x,y,cell_size,cell_size,colors.rgb(random.randint(50,255), random.randint(50,255), random.randint(50,255)))
+                    
+                    if color_mode == 0: color = colors.rgb(random.randint(50,255), random.randint(50,255), random.randint(50,255))
+                    elif color_mode == 2: color = colors.PHOSPHOR_BRIGHT
+
+                    screen.tft.fill_rect(x,y,cell_size,cell_size,color)
             elif cell == 0 and old_cell == 1:
                 screen.tft.fill_rect(x,y,cell_size,cell_size,colors.BLACK)
 
@@ -192,7 +201,7 @@ def update_timer():
 # Up is delay up, Down is delay down
 # Right is next, and Left toggles the cycle_flag
 def joycb(key):
-    global timer_rate, cycle_flag
+    global timer_rate, cycle_flag, color_mode
     if (key==keyleds.JOY_UP):
         timer_rate+=5
         if timer_rate>200:
@@ -225,6 +234,10 @@ def joycb(key):
     if (key==keyleds.KEY_RANGE):
         timer_rate = 200
         update_timer()
+    if (key==keyleds.KEY_SCOPE):
+        color_mode += 1
+        if color_mode > 2:
+            color_mode = 0
 
 
 
@@ -253,6 +266,7 @@ async def vos_main():
         keyleds.KEY_D: joycb,
         keyleds.KEY_LEVEL: joycb,
         keyleds.KEY_RANGE: joycb,
+        keyleds.KEY_SCOPE: joycb
         }
     keys=keyboardcb.KeyboardCB(keys_in_use)
     tid=timer.Timer.add_timer(timer_rate,next)
