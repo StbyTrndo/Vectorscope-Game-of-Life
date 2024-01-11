@@ -30,6 +30,8 @@ rows = screen_size_y // cell_size #number of rows in the board (rounded down fro
 cols = screen_size_x // cell_size #number of columns in the board (rounded down from the screen size)
 cycle_flag = True
 color_mode = 0
+iterations = 0
+max_iterations = 2000
 
 def presets(x):
 
@@ -85,7 +87,7 @@ def presets(x):
     del live_cells_relative
 
 def init_board():
-    global board, rows, cols, oldboard
+    global board, rows, cols, oldboard, iterations
     board = []
     row = []
 
@@ -101,6 +103,8 @@ def init_board():
 
         #black out the screen
         screen.tft.fill_rect(0,0,screen_size_x,screen_size_y,colors.BLACK)
+    
+    iterations = 0
 
 
 def printBoard():
@@ -109,6 +113,7 @@ def printBoard():
     global board
     global oldboard
     global color_mode
+    global iterations
 
     color = colors.MAGENTA #if you see this color, something's gone wrong
 
@@ -142,7 +147,7 @@ def printBoard():
 
 #update the board
 def board_update():
-    global board, oldboard
+    global board, oldboard, iterations
 
     # create a copy of the board that is unlinked from the global board variable
     newboard = []
@@ -171,9 +176,10 @@ def board_update():
                 if total == 3:
                     newboard[i][j] = 1
 
-    vos_debug.debug_print(vos_debug.DEBUG_LEVEL_INFO,str("New Board:"))
-    for row in newboard:
-        vos_debug.debug_print(vos_debug.DEBUG_LEVEL_INFO,str(row))
+    # Uncomment the below for more verbose debugging
+    # vos_debug.debug_print(vos_debug.DEBUG_LEVEL_INFO,str("New Board:"))
+    # for row in newboard:
+    #     vos_debug.debug_print(vos_debug.DEBUG_LEVEL_INFO,str(row))
 
     if (newboard == board or newboard == oldboard) and cycle_flag == True:
         init_board()
@@ -183,13 +189,18 @@ def board_update():
 
     del newboard
 
+    iterations += 1
+    vos_debug.debug_print(vos_debug.DEBUG_LEVEL_INFO,str(f"Iterations: {iterations}"))
+
 # print screen and increment the game
 def next():
 
-    #printBoardXs()
+    global iterations
+
     printBoard()
 
-    board_update()
+    if iterations > max_iterations: init_board()
+    else: board_update()
 
 # if you change the timeout we have to kill the old timer and make a new one
 def update_timer():
