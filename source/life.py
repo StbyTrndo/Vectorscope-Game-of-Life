@@ -34,6 +34,7 @@ color_mode = 3
 iterations = 0
 max_iterations = 2000
 hue = 0
+hue_step = 5/360
 
 
 def hsv_to_rgb(h, s, v):
@@ -232,8 +233,9 @@ def next():
     if iterations > max_iterations: init_board()
     else: board_update()
 
-    hue += 5/360
-    if hue >= 1: hue=0
+    if color_mode == 3:
+        hue += hue_step
+        if hue >= 1: hue=0
 
 # if you change the timeout we have to kill the old timer and make a new one
 def update_timer():
