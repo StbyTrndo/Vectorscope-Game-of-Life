@@ -10,6 +10,7 @@ from vos_state import vos_state
 import colors
 import random
 import vos_debug
+import math
 
 
 screen=screennorm.ScreenNorm()   # get the screen
@@ -29,9 +30,34 @@ cell_size = 10     # cell size in number of pixels
 rows = screen_size_y // cell_size #number of rows in the board (rounded down from the screen size)
 cols = screen_size_x // cell_size #number of columns in the board (rounded down from the screen size)
 cycle_flag = True
-color_mode = 1
+color_mode = 3
 iterations = 0
 max_iterations = 2000
+hue = 0
+
+
+def hsv_to_rgb(h, s, v):
+
+    #takes in hsv values ranging from [0,1] and outputs rgb values ranging from [0,1]
+    #taken from https://gist.github.com/mathebox/e0805f72e7db3269ec22
+
+
+    i = math.floor(h*6)
+    f = h*6 - i
+    p = v * (1-s)
+    q = v * (1-f*s)
+    t = v * (1-(1-f)*s)
+
+    r, g, b = [
+        (v, t, p),
+        (q, v, p),
+        (p, v, t),
+        (p, q, v),
+        (t, p, v),
+        (v, p, q),
+    ][int(i%6)]
+
+    return r, g, b
 
 def presets(x):
 
@@ -114,10 +140,15 @@ def printBoard():
     global oldboard
     global color_mode
     global iterations
+    global hue
 
     color = colors.MAGENTA #if you see this color, something's gone wrong
 
     if color_mode == 1: color = colors.rgb(random.randint(50,255), random.randint(50,255), random.randint(50,255))
+    elif color_mode == 3:
+        r, g, b = hsv_to_rgb(hue, 1, 1)
+        color = colors.rgb(int(r*255), int(g*255), int(b*255))
+        vos_debug.debug_print(vos_debug.DEBUG_LEVEL_INFO,str(f"Hue: {hue}"))
 
     y=0
 
@@ -190,17 +221,20 @@ def board_update():
     del newboard
 
     iterations += 1
-    vos_debug.debug_print(vos_debug.DEBUG_LEVEL_INFO,str(f"Iterations: {iterations}"))
+    #vos_debug.debug_print(vos_debug.DEBUG_LEVEL_INFO,str(f"Iterations: {iterations}"))
 
 # print screen and increment the game
 def next():
 
-    global iterations
+    global iterations, hue
 
     printBoard()
 
     if iterations > max_iterations: init_board()
     else: board_update()
+
+    hue += 5/360
+    if hue >= 1: hue=0
 
 # if you change the timeout we have to kill the old timer and make a new one
 def update_timer():
@@ -247,7 +281,7 @@ def joycb(key):
         update_timer()
     if (key==keyleds.KEY_SCOPE):
         color_mode += 1
-        if color_mode > 2:
+        if color_mode > 3:
             color_mode = 0
 
 
