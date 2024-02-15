@@ -148,7 +148,6 @@ def printBoard():
     elif color_mode == 3:
         r, g, b = hsv_to_rgb(hue, 1, 1)
         color = colors.rgb(int(r*255), int(g*255), int(b*255))
-        vos_debug.debug_print(vos_debug.DEBUG_LEVEL_INFO,str(f"Hue: {hue}"))
 
     y=0
 
@@ -221,7 +220,7 @@ def board_update():
     del newboard
 
     iterations += 1
-    #vos_debug.debug_print(vos_debug.DEBUG_LEVEL_INFO,str(f"Iterations: {iterations}"))
+    vos_debug.debug_print(vos_debug.DEBUG_LEVEL_INFO,str(f"Iterations: {iterations}"))
 
 # print screen and increment the game
 def next():
