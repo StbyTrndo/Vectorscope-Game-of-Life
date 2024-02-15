@@ -24,12 +24,12 @@ screen_size_y = 240
 
 exit_flag=False    # don't exit
 tid=None           # timer ID
-timer_rate=5       # timer rate (ticks; see vos_launch.py for multiplier)
+timer_rate=1       # timer rate (ticks; see vos_launch.py for multiplier)
 cell_size = 10     # cell size in number of pixels
 rows = screen_size_y // cell_size #number of rows in the board (rounded down from the screen size)
 cols = screen_size_x // cell_size #number of columns in the board (rounded down from the screen size)
 cycle_flag = True
-color_mode = 0
+color_mode = 1
 iterations = 0
 max_iterations = 2000
 
