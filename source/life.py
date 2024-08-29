@@ -11,6 +11,7 @@ import colors
 import random
 import vos_debug
 import math
+import gc
 
 
 screen=screennorm.ScreenNorm()   # get the screen
@@ -30,7 +31,8 @@ cell_size = 10     # cell size in number of pixels
 rows = screen_size_y // cell_size #number of rows in the board (rounded down from the screen size)
 cols = screen_size_x // cell_size #number of columns in the board (rounded down from the screen size)
 cycle_flag = True
-color_mode = 3
+color_mode = 4 #color modes 0: random at a cell level, 1: random at a frame level, 2: all phosphor bright, 3: rainbow at a frame level, 4: rainbow pastel at a frame level
+max_color_mode = 4
 iterations = 0
 max_iterations = 2000
 hue = 0
@@ -58,7 +60,7 @@ def hsv_to_rgb(h, s, v):
         (v, p, q),
     ][int(i%6)]
 
-    return r, g, b
+    return colors.rgb(int(r*255), int(g*255), int(b*255))
 
 def presets(x):
 
@@ -146,9 +148,8 @@ def printBoard():
     color = colors.MAGENTA #if you see this color, something's gone wrong
 
     if color_mode == 1: color = colors.rgb(random.randint(50,255), random.randint(50,255), random.randint(50,255))
-    elif color_mode == 3:
-        r, g, b = hsv_to_rgb(hue, 1, 1)
-        color = colors.rgb(int(r*255), int(g*255), int(b*255))
+    elif color_mode == 3: color = hsv_to_rgb(hue, 1, 1)
+    elif color_mode == 4: color = hsv_to_rgb(random.random(), 0.25, 1)
 
     y=0
 
@@ -207,10 +208,6 @@ def board_update():
                 if total == 3:
                     newboard[i][j] = 1
 
-    # Uncomment the below for more verbose debugging
-    # vos_debug.debug_print(vos_debug.DEBUG_LEVEL_INFO,str("New Board:"))
-    # for row in newboard:
-    #     vos_debug.debug_print(vos_debug.DEBUG_LEVEL_INFO,str(row))
 
     if (newboard == board or newboard == oldboard) and cycle_flag == True:
         init_board()
@@ -221,7 +218,7 @@ def board_update():
     del newboard
 
     iterations += 1
-    vos_debug.debug_print(vos_debug.DEBUG_LEVEL_INFO,str(f"Iterations: {iterations}"))
+    #vos_debug.debug_print(vos_debug.DEBUG_LEVEL_INFO,str(f"Iterations: {iterations}"))
 
 # print screen and increment the game
 def next():
@@ -229,6 +226,7 @@ def next():
     global iterations, hue
 
     printBoard()
+    #gc.collect()
 
     if iterations > max_iterations: init_board()
     else: board_update()
@@ -248,42 +246,52 @@ def update_timer():
 # Right is next, and Left toggles the cycle_flag
 def joycb(key):
     global timer_rate, cycle_flag, color_mode
-    if (key==keyleds.JOY_UP):
-        timer_rate+=5
+    if (key==keyleds.JOY_UP): #increase timer rate (slower)
+        timer_rate+=1
         if timer_rate>200:
             timer_rate=200
+        vos_debug.debug_print(vos_debug.DEBUG_LEVEL_INFO,f"Timer Rate: {timer_rate}")
         update_timer()
-    if (key==keyleds.JOY_DN):
-        timer_rate-=5
+    if (key==keyleds.JOY_DN): #decrease timer rate (faster)
+        timer_rate-=1
         if timer_rate<=0:
             timer_rate=1
+        vos_debug.debug_print(vos_debug.DEBUG_LEVEL_INFO,f"Timer Rate: {timer_rate}")
         update_timer()
-    if (key==keyleds.JOY_RT):
+    if (key==keyleds.JOY_RT): #cycle through color modes
         next()
-    if (key==keyleds.JOY_LF):
-        cycle_flag = not cycle_flag
-    if (key==keyleds.KEY_A):
+        color_mode += 1
+        if color_mode > max_color_mode:
+            color_mode = 0
+        vos_debug.debug_print(vos_debug.DEBUG_LEVEL_INFO,f"Color Mode: {color_mode}")
+    if (key==keyleds.JOY_LF): #cycle through color modes
+        color_mode -= 1
+        if color_mode < 0:
+            color_mode = max_color_mode
+        vos_debug.debug_print(vos_debug.DEBUG_LEVEL_INFO,f"Color Mode: {color_mode}")
+    if (key==keyleds.KEY_A): #random initial board
         cycle_flag = True
         init_board()
-    if (key==keyleds.KEY_B):
+    if (key==keyleds.KEY_B): # R-Pentomino
         cycle_flag = False
         presets('b')
-    if (key==keyleds.KEY_C):
+    if (key==keyleds.KEY_C): # Glider
         cycle_flag = False
         presets('c')
-    if (key==keyleds.KEY_D):
+    if (key==keyleds.KEY_D): # Diehard
         cycle_flag = False
         presets('d')
-    if (key==keyleds.KEY_LEVEL):
+    if (key==keyleds.KEY_LEVEL): #minimum timer rate (fastest)
         timer_rate = 1
+        vos_debug.debug_print(vos_debug.DEBUG_LEVEL_INFO,f"Timer Rate: {timer_rate}")
         update_timer()
-    if (key==keyleds.KEY_RANGE):
+    if (key==keyleds.KEY_RANGE): #maximum timer rate (slowest)
         timer_rate = 200
+        vos_debug.debug_print(vos_debug.DEBUG_LEVEL_INFO,f"Timer Rate: {timer_rate}")
         update_timer()
-    if (key==keyleds.KEY_SCOPE):
-        color_mode += 1
-        if color_mode > 3:
-            color_mode = 0
+    if (key==keyleds.KEY_SCOPE): #change if the board resets after completing or just stops
+        cycle_flag = not cycle_flag
+        
 
 
 
